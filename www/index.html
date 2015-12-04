@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        
+        <title>Hello World</title>
+		<link href="css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<script src="js/jquery.js"></script>
+		<script src="css/bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+		//========================================================================EVENTOS
+		//Executar essa função quando se inicia a aplicação
+		document.addEventListener("deviceready", onDeviceReady, false);
+        function onDeviceReady() 
+			{
+			document.addEventListener("pause", onPause, false);
+			document.addEventListener("resume", onResume, false);
+			//document.addEventListener("backbutton", onBackKeyDown, false);
+			document.addEventListener("menubutton", onMenuKeyDown, false);
+			document.addEventListener("batterystatus", onBatteryStatus, false);
+			document.addEventListener("batterycritical", onBatteryCritical, false);
+			document.addEventListener("batterylow", onBatteryLow, false);
+			
+            $("#teste").append("<h1>TESTE ADRIAN</h1>");
+			}
+			
+		//Executar essa função quando se pausa a aplicação
+		function onPause() 
+			{
+			$("#teste").append("<h5>Aplicação Pausada</h5>");
+			}
+			
+		//Executa quando volta a executar o app
+		function onResume() 
+			{
+			setTimeout(function() {
+				$("#teste").append("<h5>Aplicação resumida</h5>");
+				}, 0);
+			}
+		
+		//Acionar botão de voltar
+		function onBackKeyDown() 
+			{
+			$("#teste").append("<h5>Aplicação voltada</h5>");
+			}
+		
+		//Acionar botão de menu
+		function onMenuKeyDown() 
+			{
+			$("#teste").append("<h5>Menu acionado</h5>");
+			}
+
+		//Acionado quando existe mudança no nivel da bateria
+		function onBatteryStatus(info) 
+			{
+			alert("Level: " + info.level + " Carregando ? " + info.isPlugged);
+			}
+		//Acionado quando bateria está prestes a acabar
+		function onBatteryCritical(info) 
+			{
+			alert("Battery Level Critical " + info.level + "%\nRecharge Soon!");
+			}
+		//Acionado quando bateria está um pouco baixa
+		function onBatteryLow(info) 
+			{
+			alert("Battery Level Low " + info.level + "%");
+			}
+			
+			
+			
+			
+		
+		//========================================================================API
+		//Efetua a vibração do aparelho, variavel 1000 é o total de tempo de vibração em milisegundos
+		function vibrar()
+			{
+			navigator.notification.vibrate(1000);
+			}
+		
+		
+		//Verifica qual a conexão o usuário está utilizando
+		function check_network() 
+			{
+			var networkState = navigator.network.connection.type;
+				
+			var states = {};
+			states[Connection.UNKNOWN]  = 'Unknown connection';
+			states[Connection.ETHERNET] = 'Ethernet connection';
+			states[Connection.WIFI]     = 'WiFi connection';
+			states[Connection.CELL_2G]  = 'Cell 2G connection';
+			states[Connection.CELL_3G]  = 'Cell 3G connection';
+			states[Connection.CELL_4G]  = 'Cell 4G connection';
+			states[Connection.NONE]     = 'No network connection';
+
+			alert('Connection type:\n ' + states[networkState]);
+			}
+			
+			
+		//Funções de Acelerometro
+		function onSuccess(acceleration) {
+			alert('Acceleration X: ' + acceleration.x + '\n' +
+				  'Acceleration Y: ' + acceleration.y + '\n' +
+				  'Acceleration Z: ' + acceleration.z + '\n' +
+				  'Timestamp: '      + acceleration.timestamp + '\n');};
+		function onError() {
+			alert('onError!');};
+		function acelerometroumavez()
+			{
+			navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+			}
+		function acelerometrosempre()
+			{
+			var options = { frequency: 3000 };
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+			}
+		function acelerometrosemprepausar()
+			{
+			 navigator.accelerometer.clearWatch(watchID);
+			}
+		
+
+		//Pega informações do aparelho
+		function info() 
+			{
+			alert("Plataform: "+device.platform);
+			alert("Version: "+device.version);
+			alert("uuid: "+device.uuid);
+			alert("Name: "+device.name);
+			alert("Width: "+screen.width);
+			alert("Height: "+screen.height);
+			alert("ColorDepth: "+screen.colorDepth);
+			};
+		
+		
+		//Funções que tira foto e exibe na tela
+		function dump_pic(data) 
+			{
+			var viewport = document.getElementById('viewport');
+			viewport.style.display = "";
+			viewport.style.position = "absolute";
+			viewport.style.top = "10px";
+			viewport.style.left = "10px";
+			document.getElementById("test_img").src = "data:image/jpeg;base64," + data;
+			}
+		function fail(msg) { alert(msg); }
+		function tirarfoto() 
+			{
+			navigator.camera.getPicture(dump_pic, fail, {
+				quality : 50,
+				destinationType: Camera.DestinationType.DATA_URL,
+				targetWidth: 100,
+				targetHeight: 100
+			});
+			}
+		
+		
+		//Funções de localização
+		function onSuccessLocation(position) 
+			{
+			var element = document.getElementById('geolocation');
+			element.innerHTML = 'Latitude: '          + position.coords.latitude          + '<br />' +
+								'Longitude: '         + position.coords.longitude         + '<br />' +
+								'Altitude: '          + position.coords.altitude          + '<br />' +
+								'Accuracy: '          + position.coords.accuracy          + '<br />' +
+								'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '<br />' +
+								'Heading: '           + position.coords.heading           + '<br />' +
+								'Speed: '             + position.coords.speed             + '<br />' +
+								'Timestamp: '         + position.timestamp                + '<br />'+
+								'<hr />'      + element.innerHTML;
+			}
+		function onErrorLocation(error) 
+				{
+			alert('code: '    + error.code    + '\n' +
+				  'message: ' + error.message + '\n');
+			}
+		function localizar()
+			{
+			navigator.geolocation.getCurrentPosition(onSuccessLocation, onErrorLocation);
+			}
+		function localizarsempre()
+			{
+			var watchID = navigator.geolocation.watchPosition(onSuccessLocation, onErrorLocation, { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true });
+			}
+		function localizarsemprepausar()
+			{
+			navigator.geolocation.clearWatch(watchID);
+			}
+		
+		//Alerta diferenciado (notification)
+		function alertDismissed() {
+			alert("Teste");
+			}
+		function alertar()
+			{
+			navigator.notification.alert(
+					'You are the winner!',  // message
+					alertDismissed,         // callback
+					'Game Over',            // title
+					'Done'                  // buttonName
+				);
+			}
+		function onConfirm(buttonIndex) {
+			alert('You selected button ' + buttonIndex);
+		}
+		function alertar2()
+			{
+			navigator.notification.confirm(
+				'You are the winner!', // message
+				 onConfirm,            // callback to invoke with index of button pressed
+				'Game Over',           // title
+				['Restart','Exit']     // buttonLabels
+			);
+			}
+		function onPrompt(results) {
+			alert("You selected button number " + results.buttonIndex + " and entered " + results.input1);
+		}
+		function alertar3()
+			{
+			navigator.notification.prompt(
+				'Please enter your name',  // message
+				onPrompt,                  // callback to invoke
+				'Registration',            // title
+				['Ok','Exit'],             // buttonLabels
+				'Jane Doe'                 // defaultText
+			);
+			}
+				
+		
+		//Executa o som de notificação
+		function beepar()
+			{
+			navigator.notification.beep(2);
+			}
+			
+	
+		//Funçoes de compasso (Bussula)
+		function onSuccess(heading) {
+			alert('Heading: ' + heading.magneticHeading);
+			}
+		function onError(error) {
+			alert('CompassError: ' + error.code);
+			}
+		function compassoumavez()
+			{
+			navigator.compass.getCurrentHeading(onSuccess, onError);
+			}
+		function compassosempre()
+			{
+			var options = {	frequency: 3000	};
+			var watchIDcompass = navigator.compass.watchHeading(onSuccess, onError, options);
+			}
+		function compassosemprepausar()
+			{
+			navigator.compass.clearWatch(watchIDcompass);
+			}
+			
+			
+		//Pega a linguagem do local atual
+		function glob_language()
+			{
+			navigator.globalization.getPreferredLanguage(
+				function (language) 
+					{alert('language: ' + language.value + '\n');},
+				function () 
+					{alert('Error getting language\n');}
+				);
+			}
+			
+		//Pega o nome da localização
+		function glob_local()
+			{
+			navigator.globalization.getLocaleName(
+			function (locale) 
+				{alert('locale: ' + locale.value + '\n');},
+			function () 
+				{alert('Error getting locale\n');}
+				);
+			}
+		
+		//Pega a data como string
+		function glob_datestring()
+			{
+			navigator.globalization.dateToString(
+				new Date(),
+				function (date) 
+					{ alert('date: ' + date.value + '\n'); },
+				function () 
+					{ alert('Error getting dateString\n'); },
+				{ formatLength: 'short', selector: 'date and time' }
+				);
+			}
+			
+		//Retorna dados de uma moeda especifica
+		function glob_moeda()
+			{
+			navigator.globalization.getCurrencyPattern(
+			'USD',
+			function (pattern) {
+				alert('pattern: '  + pattern.pattern  + '\n' +
+					  'code: '     + pattern.code     + '\n' +
+					  'fraction: ' + pattern.fraction + '\n' +
+					  'rounding: ' + pattern.rounding + '\n' +
+					  'decimal: '  + pattern.decimal  + '\n' +
+					  'grouping: ' + pattern.grouping);
+			},
+			function () { alert('Error getting pattern\n'); }
+			);
+			}
+		
+		
+		//Retorno o nome das datas
+		function glob_datanames()
+			{
+			navigator.globalization.getDateNames(
+			function (names) 
+				{
+				for (var i = 0; i < names.value.length; i++) {
+					alert('month: ' + names.value[i] + '\n');
+				}
+				},
+			function () 
+				{ alert('Error getting names\n'); },
+				{ type: 'wide', item: 'months' }
+				);
+			}
+		
+		</script>
+    </head>
+    <body>
+        <div id="teste" class="col-xs-12" style="background-color: silver;">
+			
+        </div>
+		<input type="button" class="btn btn-lg btn-success form-control" value="Vibrar" onclick="vibrar()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="NEt" onclick="check_network()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Acelerometro Uma vez" onclick="acelerometroumavez()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Acelerometro Sempre - Ativar" onclick="acelerometrosempre()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Acelerometro Sempre - Pausar" onclick="acelerometrosemprepausar()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Informações do aparelho" onclick="info()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Tirar foto" onclick="tirarfoto()">
+			<img src="" id="test_img">
+			<div id="viewport"></div>
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Localizar" onclick="localizar()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Localizar Sempre" onclick="localizarsempre()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Localizar Pausar" onclick="localizarpausar()">
+			<div id="geolocation"></div>
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Mensagem 1" onclick="alertar()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Mensagem 2" onclick="alertar2()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Mensagem 3" onclick="alertar3()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Beepar" onclick="beepar()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Compasso - Bussula" onclick="compassoumavez()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Pega a linguagem" onclick="glob_language()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Pega o nome do local" onclick="glob_local()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Pega a Data como string" onclick="glob_datestring()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Pega a dados da moeda" onclick="glob_moeda()">
+		<input type="button" class="btn btn-lg btn-success form-control" style="width" value="Pega o nome das datas" onclick="glob_datanames()">
+		
+			
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+    </body>
+</html>
